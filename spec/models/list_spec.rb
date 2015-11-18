@@ -5,4 +5,5 @@ RSpec.describe List, type: :model do
 	let(:list) { create(:list) }
 
 	it { should belong_to(:user) }
+	it { should have_many(:items) }
 end
