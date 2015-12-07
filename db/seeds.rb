@@ -2,9 +2,18 @@
 5.times do
 	User.create(
 		username: Faker::Internet.user_name,
-		email: Faker::Internet.email
+		email: Faker::Internet.email,
+		password: 'password',
+		password_confirmation: 'password'
 	)
 end
+
+User.create(
+	username: "user",
+	email: "user@example.com",
+	password: 'password',
+	password_confirmation: 'password'
+)
 
 users = User.all
 
