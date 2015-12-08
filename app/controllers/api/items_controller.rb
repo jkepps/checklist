@@ -1,6 +1,13 @@
 class Api::ItemsController < ApiController
 	before_filter :authenticate_user
 
+	def index
+		list = List.find(params[:list_id])
+		items = list.items
+
+		render json: items, each_serializer: ItemSerializer, status: 200
+	end
+
 	def create
 		item = Item.new(item_params)
 

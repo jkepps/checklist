@@ -11,6 +11,13 @@ RSpec.describe Api::UsersController, type: :controller do
 			end
 		end
 
+		describe "GET show" do
+			it "returns http unauthenticated" do
+				get :show
+				expect(response).to have_http_status(401)
+			end
+		end
+
 		describe "POST create" do
 			it 'returns http unauthenticated' do
 				post :create
