@@ -30,6 +30,10 @@ class ApiController < ApplicationController
 		error(404, 'Record not found')
 	end
 
+	def unprocessable_entity(record)
+		error(422, record.errors.full_messages)
+	end
+
 	def error(status, message = 'Something went wrong')
 		response = {
 			response_type: "ERROR",
