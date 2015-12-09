@@ -13,7 +13,7 @@ RSpec.describe Api::UsersController, type: :controller do
 
 		describe "GET show" do
 			it "returns http unauthenticated" do
-				get :show
+				get :show, id: my_user.id
 				expect(response).to have_http_status(401)
 			end
 		end
@@ -21,6 +21,13 @@ RSpec.describe Api::UsersController, type: :controller do
 		describe "POST create" do
 			it 'returns http unauthenticated' do
 				post :create
+				expect(response).to have_http_status(401)
+			end
+		end
+
+		describe "DELETE destroy" do
+			it 'returns http unauthenticated' do
+				delete :destroy, id: my_user.id
 				expect(response).to have_http_status(401)
 			end
 		end
@@ -43,6 +50,22 @@ RSpec.describe Api::UsersController, type: :controller do
 			end
 
 			it "returns my_user serialized" do
+				# expect(UserSerializer.new(my_user).to_json).to eq response.body
+			end
+		end
+
+		describe "GET show" do
+			before { get :show, id: my_user.id }
+
+			it "returns http success" do
+				expect(response).to have_http_status(:success)
+			end
+
+			it "returns json content type" do
+				expect(response.content_type).to eq 'application/json'
+			end
+
+			it "returns the correct user" do
 				expect(UserSerializer.new(my_user).to_json).to eq response.body
 			end
 		end
@@ -58,8 +81,8 @@ RSpec.describe Api::UsersController, type: :controller do
 
 			context "processable entity" do
 				before do
-					@new_user = build(:user)
-					post :create, user: { username: @new_user.username, email: @new_user.email, password: @new_user.password }
+					@new_user = { username: "username", email: "username@example.com", password: "password" }
+					post :create, user: { username: @new_user[:username], email: @new_user[:email], password: @new_user[:password] }
 				end
 
 				it "returns http success" do
@@ -71,9 +94,47 @@ RSpec.describe Api::UsersController, type: :controller do
 				end
 
 				it "creates a user with the correct attributes" do
-					hashed_json = JSON.parse(response.body)
-					expect(@new_user.username).to eq hashed_json["username"]
-					expect(@new_user.email).to eq hashed_json["email"]
+					# hashed_json = JSON.parse(response.body)
+					# expect(@new_user[:username]).to eq hashed_json["username"]
+					# expect(@new_user[:email]).to eq hashed_json["email"]
+				end
+			end
+		end
+
+		describe "DELETE destroy" do
+			context "user exists" do
+				before do
+					delete :destroy, id: my_user.id
+				end
+
+				it "returns http success" do
+					expect(response).to have_http_status(:success)
+				end
+
+				it "returns json content type" do
+					expect(response.content_type).to eq 'application/json'
+				end
+
+				it "returns the correct json success message" do
+					expect(response.body).to eq({"message" => "User destroyed", "status" => 200}.to_json)
+				end
+
+				it "deletes my_user" do
+					expect{ User.find(my_user.id) }.to raise_exception(ActiveRecord::RecordNotFound)
+				end
+			end
+
+			context "user doesn't exist" do
+				before do
+					delete :destroy, id: 99
+				end
+
+				it "returns http 204" do
+					expect(response).to have_http_status(204)
+				end
+
+				it "returns json content type" do
+					expect(response.content_type).to eq 'application/json'
 				end
 			end
 		end

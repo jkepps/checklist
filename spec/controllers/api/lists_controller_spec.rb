@@ -25,6 +25,13 @@ RSpec.describe Api::ListsController, type: :controller do
 				expect(response).to have_http_status(401)
 			end
 		end
+
+		describe "DELETE destroy" do
+			it 'returns http unauthenticated' do
+				delete :destroy, user_id: my_user.id, id: my_list.id
+				expect(response).to have_http_status(401)
+			end
+		end
 	end
 
 	context "authenticated user" do
@@ -71,6 +78,44 @@ RSpec.describe Api::ListsController, type: :controller do
 				# 	hashed_json = JSON.parse(response.body)
 				# 	expect(@new_list.name).to eq hashed_json["name"]
 				# end
+			end
+		end
+
+		describe "DELETE destroy" do
+			context "list exists" do
+				before do
+					delete :destroy, user_id: my_user.id, id: my_list.id
+				end
+
+				it "returns http success" do
+					expect(response).to have_http_status(:success)
+				end
+
+				it "returns json content type" do
+					expect(response.content_type).to eq 'application/json'
+				end
+
+				it "returns the correct json success message" do
+					expect(response.body).to eq({"message" => "List destroyed", "status" => 200}.to_json)
+				end
+
+				it "deletes my_list" do
+					expect{ List.find(my_list.id) }.to raise_exception(ActiveRecord::RecordNotFound)
+				end
+			end
+
+			context "list doesn't exist" do
+				before do
+					delete :destroy, user_id: my_user.id, id: 99
+				end
+
+				it "returns http 204" do
+					expect(response).to have_http_status(204)
+				end
+
+				it "returns json content type" do
+					expect(response.content_type).to eq 'application/json'
+				end
 			end
 		end
 	end

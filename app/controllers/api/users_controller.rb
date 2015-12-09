@@ -20,6 +20,16 @@ class Api::UsersController < ApiController
 		end
 	end
 
+	def destroy
+		begin
+			user = User.find(params[:id])
+			user.destroy
+			render json: {message: "User destroyed", status: 200}, status: 200
+		rescue ActiveRecord::RecordNotFound
+			render json: {message: "User not found", status: 204}, status: 204
+		end
+	end
+
 	private
 	def user_params
 		params.require(:user).permit(:email, :username, :password)

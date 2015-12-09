@@ -25,6 +25,17 @@ class Api::ListsController < ApiController
 		end
 	end
 
+	def destroy
+		begin
+			user = User.find(params[:user_id])
+			list = user.lists.find(params[:id])
+			list.destroy
+			render json: {message: "List destroyed", status: 200}, status: 200
+		rescue
+			render json: {message: "List not found", status: 204}, status: 204
+		end
+	end
+
 	private
 	def list_params
 		params.require(:list).permit(:name)
