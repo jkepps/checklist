@@ -1,5 +1,5 @@
 class ListSerializer <  BaseSerializer
-	attributes :name
+	attributes :name, :permissions
 
   has_many :items
 end

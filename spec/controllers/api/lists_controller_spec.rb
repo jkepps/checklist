@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe Api::ListsController, type: :controller do
 	let (:my_user) { create(:user) }
-	let (:my_list) { create(:list, user_id: my_user.id) }
+	let (:my_list) { create(:list, user: my_user) }
 
 	context "unauthenticated user" do
 		describe "GET index" do
@@ -22,6 +22,13 @@ RSpec.describe Api::ListsController, type: :controller do
 		describe "POST create" do
 			it 'returns http unauthenticated' do
 				post :create, user_id: my_user.id, list: { name: "list" }
+				expect(response).to have_http_status(401)
+			end
+		end
+
+		describe "PUT update" do
+			it "returns http unauthenticated" do
+				put :update, user_id: my_user.id, id: my_list.id, list: { permissions: :closed }
 				expect(response).to have_http_status(401)
 			end
 		end
@@ -72,7 +79,7 @@ RSpec.describe Api::ListsController, type: :controller do
 			context "processable entity" do
 				before do
 					@new_list = build(:list, user_id: my_user.id)
-					post :create, user_id: my_user.id, list: { name: @new_list.name }
+					post :create, user_id: my_user.id, list: { name: @new_list.name, permissions: @new_list.permissions }
 				end
 
 				it "returns http success" do
@@ -86,6 +93,38 @@ RSpec.describe Api::ListsController, type: :controller do
 				it "creates a list with the correct attributes" do
 					hashed_json = JSON.parse(response.body)
 					expect(@new_list.name).to eq hashed_json["list"]["name"]
+				end
+			end
+		end
+
+		describe "PUT update" do
+			context "unprocessable entity" do
+				before { put :update, user_id: my_user.id, id: my_list.id, list: { name: "" } }
+
+				it "returns http unprocessable entity" do
+					expect(response).to have_http_status(:unprocessable_entity)
+				end
+			end
+
+			context "processable entity" do
+				before do
+					@new_list_name = "New List Name"
+					@new_list_permissions = "closed"
+					put :update, user_id: my_user.id, id: my_list.id, list: { name: @new_list_name, permissions: @new_list_permissions}
+				end
+
+				it "returns http success" do
+					expect(response).to have_http_status(:success)
+				end
+
+				it "returns json content type" do 
+					expect(response.content_type).to eq 'application/json'
+				end
+
+				it "updates the list with the correct attributes" do
+					hashed_json = JSON.parse(response.body)
+					expect(@new_list_name).to eq hashed_json["list"]["name"]
+					expect(@new_list_permissions).to eq hashed_json["list"]["permissions"]
 				end
 			end
 		end

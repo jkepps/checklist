@@ -5,6 +5,7 @@ FactoryGirl.define do
 
   factory :list do
     name
+    permissions 2
   end
 
 end

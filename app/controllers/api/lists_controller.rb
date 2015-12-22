@@ -25,6 +25,16 @@ class Api::ListsController < ApiController
 		end
 	end
 
+	def update
+		list = List.find(params[:id])
+
+		if list.update(list_params)
+			render json: list
+		else
+			unprocessable_entity(list)
+		end
+	end
+
 	def destroy
 		begin
 			user = User.find(params[:user_id])
@@ -38,6 +48,6 @@ class Api::ListsController < ApiController
 
 	private
 	def list_params
-		params.require(:list).permit(:name)
+		params.require(:list).permit(:name, :permissions)
 	end
 end

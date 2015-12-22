@@ -2,8 +2,8 @@ require 'rails_helper'
 
 RSpec.describe Api::ItemsController, type: :controller do
 	let(:my_user) { create(:user) }
-	let(:my_list) { create(:list, user_id: my_user.id) }
-	let(:my_item) { create(:item, list_id: my_list.id) }
+	let(:my_list) { create(:list, user: my_user) }
+	let(:my_item) { create(:item, list: my_list) }
 
 	context "unauthenticated user" do
 		describe "GET index" do
