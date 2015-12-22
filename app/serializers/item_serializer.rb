@@ -1,3 +1,3 @@
 class ItemSerializer < BaseSerializer
-  attributes :description
+  attributes :description, :completed
 end

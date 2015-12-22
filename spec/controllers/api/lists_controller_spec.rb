@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe Api::ListsController, type: :controller do
 	let (:my_user) { create(:user) }
-	let (:my_list) { create(:list, user: my_user) }
+	let (:my_list) { create(:list, user_id: my_user.id) }
 
 	context "unauthenticated user" do
 		describe "GET index" do
@@ -49,6 +49,15 @@ RSpec.describe Api::ListsController, type: :controller do
 			it "returns json content type" do
 				expect(response.content_type).to eq 'application/json'
 			end
+
+			it "returns serialized version all lists" do
+				# hashed_json = JSON.parse(response.body)
+				# puts "*" * 20
+				# puts response.body.inspect
+				# puts "*" * 20
+				# puts my_user.lists.inspect
+				# expect(hashed_json["lists"]).to eq [my_list]
+			end
 		end
 
 		describe "POST create" do
@@ -62,7 +71,7 @@ RSpec.describe Api::ListsController, type: :controller do
 
 			context "processable entity" do
 				before do
-					@new_list = build(:list)
+					@new_list = build(:list, user_id: my_user.id)
 					post :create, user_id: my_user.id, list: { name: @new_list.name }
 				end
 
@@ -74,10 +83,10 @@ RSpec.describe Api::ListsController, type: :controller do
 					expect(response.content_type).to eq 'application/json'
 				end
 
-				# it "creates a list with the correct attributes" do
-				# 	hashed_json = JSON.parse(response.body)
-				# 	expect(@new_list.name).to eq hashed_json["name"]
-				# end
+				it "creates a list with the correct attributes" do
+					hashed_json = JSON.parse(response.body)
+					expect(@new_list.name).to eq hashed_json["list"]["name"]
+				end
 			end
 		end
 

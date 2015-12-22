@@ -50,7 +50,10 @@ RSpec.describe Api::UsersController, type: :controller do
 			end
 
 			it "returns my_user serialized" do
-				# expect(UserSerializer.new(my_user).to_json).to eq response.body
+				hashed_json = JSON.parse(response.body)
+				expect(hashed_json["users"].first["email"]). to eq my_user.email
+				expect(hashed_json["users"].first["username"]). to eq my_user.username
+				expect(hashed_json["users"].first["lists"]). to eq my_user.lists
 			end
 		end
 
@@ -94,9 +97,9 @@ RSpec.describe Api::UsersController, type: :controller do
 				end
 
 				it "creates a user with the correct attributes" do
-					# hashed_json = JSON.parse(response.body)
-					# expect(@new_user[:username]).to eq hashed_json["username"]
-					# expect(@new_user[:email]).to eq hashed_json["email"]
+					hashed_json = JSON.parse(response.body)
+					expect(hashed_json["username"]).to eq @new_user["username"]
+					expect(hashed_json["email"]).to eq @new_user["email"]
 				end
 			end
 		end

@@ -15,6 +15,10 @@ RSpec.describe List, type: :model do
 		it "should respond to name" do
 			expect(list).to respond_to(:name)
 		end
+
+		it "should respond to permissions" do
+			expect(list).to respond_to(:permissions)
+		end
 	end
 
 	describe "an invalid list" do

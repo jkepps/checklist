@@ -18,8 +18,19 @@ class Api::ItemsController < ApiController
 		end
 	end
 
+	def update
+		list = List.find(params[:list_id])
+		item = list.items.find(params[:id])
+
+		if item.update(item_params)
+			render json: item
+		else
+			unprocessable_entity(item)
+		end
+	end
+
 	private
 	def item_params
-		params.require(:item).permit(:description)
+		params.require(:item).permit(:description, :completed)
 	end
 end
